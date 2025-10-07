@@ -1,0 +1,5 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY docker_example.py .
+RUN pip install --no-cache-dir termcolor
+CMD ["python", "docker_example.py"]
