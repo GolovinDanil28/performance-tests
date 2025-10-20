@@ -30,13 +30,13 @@ class GetOperationsSummaryQueryDict(TypedDict):
     """
     accountId: str
 
+
 class BaseOperationRequestDict(TypedDict):
     """
     Базовая структура данных для создания операций.
     """
     status: str
     amount: float
-    accountId: str
 
 
 class CardOperationRequestDict(BaseOperationRequestDict):
@@ -44,6 +44,8 @@ class CardOperationRequestDict(BaseOperationRequestDict):
     Базовая структура данных для операций с картой.
     """
     cardId: str
+    accountId: str
+
 
 class MakeFeeOperationRequestDict(CardOperationRequestDict):
     """
@@ -66,12 +68,10 @@ class MakeCashbackOperationRequestDict(CardOperationRequestDict):
     pass
 
 
-class MakeTransferOperationRequestDict(TypedDict):
+class MakeTransferOperationRequestDict(BaseOperationRequestDict):
     """
     Структура данных для создания операции перевода.
     """
-    status: str
-    amount: float
     fromAccountId: str
     toAccountId: str
 
