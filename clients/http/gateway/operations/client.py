@@ -1,6 +1,8 @@
 from typing import TypedDict
 from httpx import Response, QueryParams
 from clients.http.client import HTTPClient
+from clients.http.gateway.client import build_gateway_http_client
+
 
 
 class GetOperationQueryDict(TypedDict):
@@ -205,3 +207,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Объект httpx.Response с результатом создания операции.
         """
         return self.post("/api/v1/operations/make-cash-withdrawal-operation", json=request)
+
+def build_operation_gateway_http_client()->OperationsGatewayHTTPClient:
+    return OperationsGatewayHTTPClient(client=build_gateway_http_client())
