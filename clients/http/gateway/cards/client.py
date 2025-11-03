@@ -2,90 +2,51 @@ from clients.http.client import HTTPClient
 from typing import TypedDict
 from httpx import Response, request
 from clients.http.gateway.client import build_gateway_http_client
-
-
-class CardDict(TypedDict):
-    id:str
-    pin:str
-    cvv:str
-    type:str
-    status: str
-    accountId: str
-    cardNumber: str
-    cardHolder: str
-    expiryDate: str
-    paymentSystem: str
-
-
-
-class IssueCardRequestDict(TypedDict):
-    """
-    Структура данных для создания карты
-    """
-    userId: str
-    accountId: str
-
-class IssueCardResponseDict(TypedDict):
-    card: CardDict
-
-
-class IssuePhysicalCardRequestDict(TypedDict):
-    """
-    Структура данных для создания карты
-    """
-    userId: str
-    accountId: str
-
-class IssueVirtualCardRequestDict(TypedDict):
-    """
-    Структура данных для создания карты
-    """
-    userId: str
-    accountId: str
-
-class IssueVirtualCardResponseDict(TypedDict):
-    card: CardDict
-
-class IssuePhysicalCardResponseDict(TypedDict):
-    card: CardDict
-
+from clients.http.gateway.cards.schema import (
+    IssuePhysicalCardRequestSchema,
+    IssuePhysicalCardResponseSchema,
+    IssueVirtualCardRequestSchema,
+    IssueVirtualCardResponseSchema
+)
 
 class CardsGatewayHTTPClient(HTTPClient):
     """
-    Клиент взаимодействия с API карт сервиса http-gateway
+    Клиент для взаимодействия с /api/v1/cards сервиса http-gateway.
     """
 
-    def issue_virtual_card_api(self, request: IssueCardRequestDict) -> Response:
+    def issue_virtual_card_api(self, request: IssueVirtualCardRequestSchema) -> Response:
         """
-        Создание виртуальной карты для указанного пользователя и счета
+        Выпуск виртуальной карты.
 
-        :param request: Словарь с данными для создания карты, содержащий:
-            userId - идентификатор пользователя
-            accountId - идентификатор счета
-        :return: Ответ от сервера с деталями созданной карты (объект httpx.Response)
+        :param request: Pydantic-модель с данными для выпуска виртуальной карты.
+        :return: Ответ от сервера (объект httpx.Response).
         """
-        return self.post("/api/v1/cards/issue-virtual-card", json=request)
+        return self.post(
+            "/api/v1/cards/issue-virtual-card",
+            json=request.model_dump(by_alias=True)
+        )
 
-    def issue_physical_card_api(self, request: IssueCardRequestDict) -> Response:
+    def issue_physical_card_api(self, request: IssuePhysicalCardRequestSchema) -> Response:
         """
-        Создание физической карты для указанного пользователя и счета
+        Выпуск физической карты.
 
-        :param request: Словарь с данными для создания карты, содержащий:
-            userId - идентификатор пользователя
-            accountId - идентификатор счета
-        :return: Ответ от сервера с деталями созданной карты (объект httpx.Response)
+        :param request: Pydantic-модель с данными для выпуска физической карты.
+        :return: Ответ от сервера (объект httpx.Response).
         """
-        return self.post("/api/v1/cards/issue-physical-card", json=request)
+        return self.post(
+            "/api/v1/cards/issue-physical-card",
+            json=request.model_dump(by_alias=True)
+        )
 
-    def issue_virtual_card(self, user_id: str, account_id: str) -> IssueVirtualCardResponseDict:
-        request = IssueCardRequestDict(userId=user_id, accountId=account_id)
+    def issue_virtual_card(self, user_id: str, account_id: str) -> IssueVirtualCardResponseSchema:
+        request = IssueVirtualCardRequestSchema(user_id=user_id, account_id=account_id)
         response = self.issue_virtual_card_api(request)
-        return response.json()
+        return IssueVirtualCardResponseSchema.model_validate_json(response.text)
 
-    def issue_physical_card(self, user_id: str, account_id: str) -> IssuePhysicalCardResponseDict:
-        request = IssueCardRequestDict(userId=user_id, accountId=account_id)
+    def issue_physical_card(self, user_id: str, account_id: str) -> IssuePhysicalCardResponseSchema:
+        request = IssuePhysicalCardRequestSchema(user_id=user_id, account_id=account_id)
         response = self.issue_physical_card_api(request)
-        return response.json()
+        return IssuePhysicalCardResponseSchema.model_validate_json(response.text)
 
 def build_cards_gateway_http_client()->CardsGatewayHTTPClient:
     return CardsGatewayHTTPClient(client=build_gateway_http_client())
