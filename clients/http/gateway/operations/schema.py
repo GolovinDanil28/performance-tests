@@ -1,5 +1,6 @@
 from enum import StrEnum
 from pydantic import BaseModel, Field, ConfigDict
+from tools.fakers import fake
 
 
 class OperationType(StrEnum):
@@ -181,8 +182,8 @@ class BaseOperationRequestSchema(BaseModel):
     """
     model_config = ConfigDict(populate_by_name=True)
 
-    status: OperationStatus
-    amount: float
+    status: OperationStatus = Field(default_factory=lambda: fake.enum(OperationStatus))
+    amount: float = Field(default_factory=fake.amount)
 
 
 class CardOperationRequestSchema(BaseOperationRequestSchema):
@@ -232,8 +233,8 @@ class MakePurchaseOperationRequestSchema(CardOperationRequestSchema):
     """
     model_config = ConfigDict(populate_by_name=True)
 
-    category: str
-    merchant: str
+    category: str = Field(default_factory=fake.category)
+    merchant: str = Field(default_factory=fake.last_name)
 
 
 class MakeBillPaymentOperationRequestSchema(CardOperationRequestSchema):
@@ -242,8 +243,8 @@ class MakeBillPaymentOperationRequestSchema(CardOperationRequestSchema):
     """
     model_config = ConfigDict(populate_by_name=True)
 
-    bill_id: str = Field(alias="billId")
-    payment_purpose: str = Field(alias="paymentPurpose")
+    bill_id: str = Field(alias="billId", default_factory=lambda: f"bill_{fake.uuid4})")
+    payment_purpose: str = Field(alias="paymentPurpose", default_factory=lambda : fake.faker.sentence)
 
 
 class MakeCashWithdrawalOperationRequestSchema(CardOperationRequestSchema):
@@ -252,4 +253,4 @@ class MakeCashWithdrawalOperationRequestSchema(CardOperationRequestSchema):
     """
     model_config = ConfigDict(populate_by_name=True)
 
-    atm_id: str = Field(alias="atmId")
+    atm_id: str = Field(alias="atmId",default_factory=lambda: f"atm_{fake.uuid4}")

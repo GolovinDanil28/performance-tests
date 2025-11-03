@@ -40,13 +40,7 @@ class UsersGatewayHTTPClient(HTTPClient):
         return GetUserResponseSchema.model_validate_json(response.text)
 
     def create_user(self) -> CreateUserResponseSchema:
-        request = CreateUserRequestSchema(
-            email= f"user.{time.time()}@example.com",
-            last_name = fake.last_name(),
-            first_name = fake.first_name(),
-            middle_name= fake.name(),
-            phone_number= fake.phone_number()
-        )
+        request = CreateUserRequestSchema()
         response = self.create_user_api(request)
         return CreateUserResponseSchema.model_validate_json(response.text)
 

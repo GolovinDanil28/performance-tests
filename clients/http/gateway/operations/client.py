@@ -2,7 +2,6 @@ from httpx import Response, QueryParams
 from clients.http.client import HTTPClient
 from clients.http.gateway.client import build_gateway_http_client
 from clients.http.gateway.operations.schema import (
-    OperationStatus,
     GetOperationsQuerySchema,
     GetOperationsSummaryQuerySchema,
     GetOperationResponseSchema,
@@ -185,8 +184,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Pydantic-модель с созданной операцией.
         """
         request = MakeFeeOperationRequestSchema(
-            status=OperationStatus.COMPLETED,
-            amount=55.77,
             card_id=card_id,
             account_id=account_id
         )
@@ -202,8 +199,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Pydantic-модель с созданной операцией.
         """
         request = MakeTopUpOperationRequestSchema(
-            status=OperationStatus.COMPLETED,
-            amount=1500.11,
             card_id=card_id,
             account_id=account_id
         )
@@ -219,8 +214,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Pydantic-модель с созданной операцией.
         """
         request = MakeCashbackOperationRequestSchema(
-            status=OperationStatus.COMPLETED,
-            amount=25.50,
             card_id=card_id,
             account_id=account_id
         )
@@ -236,8 +229,6 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Pydantic-модель с созданной операцией.
         """
         request = MakeTransferOperationRequestSchema(
-            status=OperationStatus.COMPLETED,
-            amount=1000.0,
             from_account_id=from_account_id,
             to_account_id=to_account_id
         )
@@ -253,12 +244,8 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Pydantic-модель с созданной операцией.
         """
         request = MakePurchaseOperationRequestSchema(
-            status=OperationStatus.COMPLETED,
-            amount=500.75,
             card_id=card_id,
-            account_id=account_id,
-            category="shopping",
-            merchant="Online Store"
+            account_id=account_id
         )
         response = self.make_purchase_operation_api(request)
         return MakePurchaseOperationResponseSchema.model_validate_json(response.text)
@@ -272,12 +259,8 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Pydantic-модель с созданной операцией.
         """
         request = MakeBillPaymentOperationRequestSchema(
-            status=OperationStatus.COMPLETED,
-            amount=250.0,
             card_id=card_id,
-            account_id=account_id,
-            bill_id="bill_12345",
-            payment_purpose="Utility payment"
+            account_id=account_id
         )
         response = self.make_bill_payment_operation_api(request)
         return MakeBillPaymentOperationResponseSchema.model_validate_json(response.text)
@@ -291,11 +274,8 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :return: Pydantic-модель с созданной операцией.
         """
         request = MakeCashWithdrawalOperationRequestSchema(
-            status=OperationStatus.COMPLETED,
-            amount=300.0,
             card_id=card_id,
-            account_id=account_id,
-            atm_id="atm_67890"
+            account_id=account_id
         )
         response = self.make_cash_withdrawal_operation_api(request)
         return MakeCashWithdrawalOperationResponseSchema.model_validate_json(response.text)
