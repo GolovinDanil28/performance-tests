@@ -1,6 +1,7 @@
 from httpx import Response, QueryParams
-from clients.http.client import HTTPClient
-from clients.http.gateway.client import build_gateway_http_client
+from locust.env import Environment
+from clients.http.client import HTTPClient, HTTPClientExtentions
+from clients.http.gateway.client import build_gateway_http_client, build_gateway_locust_http_client
 from clients.http.gateway.operations.schema import (
     GetOperationsQuerySchema,
     GetOperationsSummaryQuerySchema,
@@ -40,7 +41,10 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :param operation_id: Идентификатор операции.
         :return: Объект httpx.Response с данными об операции.
         """
-        return self.get(f"/api/v1/operations/{operation_id}")
+        return self.get(
+            f"/api/v1/operations/{operation_id}",
+            extensions=HTTPClientExtentions(route="/api/v1/operations/{operation_id}")
+        )
 
     def get_operation_receipt_api(self, operation_id: str) -> Response:
         """
@@ -49,7 +53,10 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :param operation_id: Идентификатор операции.
         :return: Объект httpx.Response с данными чека операции.
         """
-        return self.get(f"/api/v1/operations/operation-receipt/{operation_id}")
+        return self.get(
+            f"/api/v1/operations/operation-receipt/{operation_id}",
+            extensions=HTTPClientExtentions(route="/api/v1/operations/operation-receipt/{operation_id}")
+        )
 
     def get_operations_api(self, query: GetOperationsQuerySchema) -> Response:
         """
@@ -58,7 +65,11 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :param query: Pydantic-модель с параметрами запроса.
         :return: Объект httpx.Response со списком операций счета.
         """
-        return self.get("/api/v1/operations", params=QueryParams(**query.model_dump(by_alias=True)))
+        return self.get(
+            "/api/v1/operations", 
+            params=QueryParams(**query.model_dump(by_alias=True)),
+            extensions=HTTPClientExtentions(route="/api/v1/operations")
+        )
 
     def get_operations_summary_api(self, query: GetOperationsSummaryQuerySchema) -> Response:
         """
@@ -67,7 +78,11 @@ class OperationsGatewayHTTPClient(HTTPClient):
         :param query: Pydantic-модель с параметрами запроса.
         :return: Объект httpx.Response со статистикой операций счета.
         """
-        return self.get("/api/v1/operations/operations-summary", params=QueryParams(**query.model_dump(by_alias=True)))
+        return self.get(
+            "/api/v1/operations/operations-summary", 
+            params=QueryParams(**query.model_dump(by_alias=True)),
+            extensions=HTTPClientExtentions(route="/api/v1/operations/operations-summary")
+        )
 
     def make_fee_operation_api(self, request: MakeFeeOperationRequestSchema) -> Response:
         """
@@ -288,3 +303,15 @@ def build_operations_gateway_http_client() -> OperationsGatewayHTTPClient:
     :return: Экземпляр OperationsGatewayHTTPClient.
     """
     return OperationsGatewayHTTPClient(client=build_gateway_http_client())
+
+def build_operations_gateway_locust_http_client(environment: Environment) -> OperationsGatewayHTTPClient:
+    """
+    Функция создаёт экземпляр OperationsGatewayHTTPClient адаптированного под Locust.
+
+    Клиент автоматически собирает метрики и передаёт их в Locust через хуки.
+    Используется исключительно в нагрузочных тестах.
+
+    :param environment: объект окружения Locust.
+    :return: экземпляр OperationsGatewayHTTPClient с хуками сбора метрик.
+    """
+    return OperationsGatewayHTTPClient(client=build_gateway_locust_http_client(environment))
