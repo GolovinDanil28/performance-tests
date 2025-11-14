@@ -1,6 +1,6 @@
 import time
 from locust.env import Environment
-from clients.http.client import HTTPClient, HTTPClientExtentions
+from clients.http.client import HTTPClient, HTTPClientExtensions
 from httpx import Response, Client
 from clients.http.gateway.client import build_gateway_http_client, build_gateway_locust_http_client
 from clients.http.gateway.users.schema import (
@@ -26,7 +26,7 @@ class UsersGatewayHTTPClient(HTTPClient):
 
         return self.get(
             f"/api/v1/users/{user_id}",
-            extensions=HTTPClientExtentions(route="/api/v1/users/{user_id}")
+            extensions=HTTPClientExtensions(route="/api/v1/users/{user_id}")
         )
 
     def create_user_api(self, request: CreateUserRequestSchema) -> Response:

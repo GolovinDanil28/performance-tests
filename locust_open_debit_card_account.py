@@ -1,46 +1,37 @@
-from locust import HttpUser, between, task
-from tools.fakers import fake
+from locust import User, between, task
+from clients.http.gateway.users.client import UsersGatewayHTTPClient, build_users_gateway_locust_http_client
+from clients.http.gateway.accounts.client import AccountsGatewayHTTPClient, build_accounts_gateway_locust_http_client
+from clients.http.gateway.users.schema import CreateUserResponseSchema
 
 
-class OpenDebitCardAccountScenarioUser(HttpUser):
+class OpenDebitCardAccountScenarioUser(User):
+    host = "localhost"
     wait_time = between(1, 3)
-    user_id: str
+    users_gateway_client: UsersGatewayHTTPClient
+    accounts_gateway_client: AccountsGatewayHTTPClient
+    create_user_response: CreateUserResponseSchema
 
     def on_start(self) -> None:
         """
         Метод on_start вызывается один раз при запуске каждой сессии виртуального пользователя.
-        Здесь мы создаем нового пользователя, отправляя POST-запрос к /api/v1/users.
+        Здесь мы инициализируем API-клиенты и создаем нового пользователя.
         """
-        user_data = {
-            "email": fake.email(),
-            "lastName": fake.last_name(),
-            "firstName": fake.first_name(),
-            "middleName": fake.middle_name(),
-            "phoneNumber": fake.phone_number()
-        }
+        # Инициализируем клиент для работы с пользователями
+        self.users_gateway_client = build_users_gateway_locust_http_client(self.environment)
+        
+        # Инициализируем клиент для работы со счетами
+        self.accounts_gateway_client = build_accounts_gateway_locust_http_client(self.environment)
+        
+        # Создаем пользователя через API-клиент
+        self.create_user_response = self.users_gateway_client.create_user()
 
-        with self.client.post(
-            "/api/v1/users", 
-            json=user_data,
-            catch_response=True
-        ) as response:
-            if response.status_code == 200:
-                self.user_id = response.json()["user"]["id"]
-            else:
-                response.failure(f"User creation failed: {response.status_code}")
 
     @task
     def open_debit_account(self):
         """
         Основная нагрузочная задача: открытие дебетового счёта для созданного пользователя.
-        Здесь мы выполняем POST-запрос к /api/v1/accounts/open-debit-card-account,
-        передавая ранее полученный user_id в теле запроса.
+        Используем API-клиент для отправки запроса.
         """
-        account_data = {
-            "user_id": self.user_id
-        }
-        
-        self.client.post(
-            "/api/v1/accounts/open-debit-card-account",
-            json=account_data
+        self.accounts_gateway_client.open_debit_card_account(
+            user_id=self.create_user_response.user.id
         )
