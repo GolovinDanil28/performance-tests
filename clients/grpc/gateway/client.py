@@ -27,3 +27,4 @@ def build_gateway_locust_grpc_client(environment: Environment) -> Channel:
 
     # Создаём обычный канал
     channel = insecure_channel("localhost:9003")
+    return intercept_channel(channel, locust_interceptor)

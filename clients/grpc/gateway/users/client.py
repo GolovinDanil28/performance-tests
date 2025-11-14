@@ -1,7 +1,7 @@
 from grpc import Channel
-
-from clients.grpc.client import GRPCClient
 from locust.env import Environment
+from clients.grpc.client import GRPCClient
+
 from clients.grpc.gateway.client import build_gateway_grpc_client, build_gateway_locust_grpc_client
 from contracts.services.gateway.users.rpc_create_user_pb2 import CreateUserRequest, CreateUserResponse
 from contracts.services.gateway.users.rpc_get_user_pb2 import GetUserRequest, GetUserResponse
