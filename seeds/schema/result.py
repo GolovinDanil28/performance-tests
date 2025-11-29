@@ -30,13 +30,19 @@ class SeedAccountResult(BaseModel):
     Attributes:
         account_id (str): Уникальный идентификатор счёта.
         physical_cards (list[SeedCardResult]): Список физических карт, привязанных к счёту.
+        virtual_cards (list[SeedCardResult]): Список виртуальных карт, привязанных к счёту.
         top_up_operations (list[SeedOperationResult]): Список операций пополнения.
         purchase_operations (list[SeedOperationResult]): Список операций покупки.
+        transfer_operations (list[SeedOperationResult]): Список операций перевода.
+        cash_withdrawal_operations (list[SeedOperationResult]): Список операций снятия наличных.
     """
     account_id: str
     physical_cards: list[SeedCardResult] = Field(default_factory=list)
+    virtual_cards: list[SeedCardResult] = Field(default_factory=list)
     top_up_operations: list[SeedOperationResult] = Field(default_factory=list)
     purchase_operations: list[SeedOperationResult] = Field(default_factory=list)
+    transfer_operations: list[SeedOperationResult] = Field(default_factory=list)
+    cash_withdrawal_operations: list[SeedOperationResult] = Field(default_factory=list)
 
 
 class SeedUserResult(BaseModel):
