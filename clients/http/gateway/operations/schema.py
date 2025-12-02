@@ -16,7 +16,6 @@ class OperationType(StrEnum):
 class OperationStatus(StrEnum):
     FAILED = "FAILED"
     COMPLETED = "COMPLETED"
-    PENDING = "PENDING"
     IN_PROGRESS = "IN_PROGRESS"
 
 

@@ -68,7 +68,7 @@ class OperationsGatewayHTTPClient(HTTPClient):
         return self.get(
             "/api/v1/operations", 
             params=QueryParams(**query.model_dump(by_alias=True)),
-            extensions=HTTPClientExtentions(route="/api/v1/operations")
+            extensions=HTTPClientExtensions(route="/api/v1/operations")
         )
 
     def get_operations_summary_api(self, query: GetOperationsSummaryQuerySchema) -> Response:
