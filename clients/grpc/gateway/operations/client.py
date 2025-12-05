@@ -170,7 +170,7 @@ class OperationsGatewayGRPCClient(GRPCClient):
         :param operation_id: Идентификатор операции.
         :return: Ответ с данными операции.
         """
-        request = GetOperationRequest(operation_id=operation_id)
+        request = GetOperationRequest(id=operation_id)
         return self.get_operation_api(request)
 
     def get_operation_receipt(self, operation_id: str) -> GetOperationReceiptResponse:
