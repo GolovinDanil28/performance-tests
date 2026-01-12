@@ -1,10 +1,16 @@
 from locust import User, between
 
+from config import settings  # ← импорт глобального объекта настроек
+
 
 class LocustBaseUser(User):
     """
-    Пользователь Locust, исполняющий последовательный сценарий получения документов.
+    Базовый виртуальный пользователь Locust, от которого наследуются все сценарии.
+    Содержит общие настройки, которые могут быть переопределены при необходимости.
     """
-    host = "localhost"
+    host: str = "localhost"
     abstract = True
-    wait_time = between(1, 3)
+    wait_time = between(
+        min_wait=settings.locust_user.wait_time_min,
+        max_wait=settings.locust_user.wait_time_max
+    )

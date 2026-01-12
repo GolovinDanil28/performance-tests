@@ -1,11 +1,14 @@
 import logging
-
 from httpx import Client
-from locust.env import Environment  # Импорт окружения Locust для передачи в хуки
+from locust.env import Environment
 
+# Импортируем settings из config.py
+from config import settings
+
+# Импортируем существующие хуки
 from clients.http.event_hooks.locust_event_hook import (
-    locust_request_event_hook,  # Хук для отслеживания начала запроса
-    locust_response_event_hook  # Хук для сбора метрик по завершении запроса
+    locust_request_event_hook,
+    locust_response_event_hook
 )
 
 
@@ -15,7 +18,11 @@ def build_gateway_http_client() -> Client:
 
     :return: Готовый к использованию объект httpx.Client.
     """
-    return Client(timeout=100, base_url="http://localhost:8003")
+    return Client(
+        # Используем client_url и timeout из настроек вместо захардкоженных значений
+        timeout=settings.gateway_http_client.timeout,
+        base_url=settings.gateway_http_client.client_url
+    )
 
 
 def build_gateway_locust_http_client(environment: Environment) -> Client:
@@ -38,8 +45,9 @@ def build_gateway_locust_http_client(environment: Environment) -> Client:
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
     return Client(
-        timeout=100,
-        base_url="http://localhost:8003",
+        # Используем client_url и timeout из настроек вместо захардкоженных значений
+        timeout=settings.gateway_http_client.timeout,
+        base_url=settings.gateway_http_client.client_url,
         event_hooks={
             "request": [locust_request_event_hook],  # Отмечаем время начала запроса
             "response": [locust_response_event_hook(environment)]  # Собираем метрики и передаём их в Locust
